@@ -68,7 +68,6 @@ _escaper = ParamEscaper()
 # Patch ORM library
 @classmethod
 def create_ad_hoc_field(cls, db_type):
-    from fields import TupleField
     import infi.clickhouse_orm.fields as orm_fields
 
     # Enums
@@ -96,10 +95,6 @@ def create_ad_hoc_field(cls, db_type):
     if db_type.startswith('Decimal'):
         nums = [int(n) for n in db_type[8:-1].split(',')]
         return orm_fields.DecimalField(nums[0], nums[1])
-
-    if db_type.startswith('Tuple'):
-        inner_field = cls.create_ad_hoc_field(db_type[6 : -1])
-        return TupleField(inner_field)
 
     # Simple fields
     name = db_type + 'Field'
