@@ -26,7 +26,7 @@ colspecs = {}
 class ARRAY(sqltypes.TypeEngine):
     __visit_name__ = 'ARRAY'
 
-class TUPLE(sqltypes.TypeEngine):
+class TUPLE(sqltypes.TupleType):
     __visit_name__ = 'TUPLE'
 
 # Type converters
