@@ -26,9 +26,6 @@ colspecs = {}
 class ARRAY(sqltypes.TypeEngine):
     __visit_name__ = 'ARRAY'
 
-class TUPLE(sqltypes.TupleType):
-    __visit_name__ = 'TUPLE'
-
 # Type converters
 ischema_names = {
     'Int64': INTEGER,
@@ -50,7 +47,6 @@ ischema_names = {
     'Enum16': VARCHAR,
     'Array': ARRAY,
     'Decimal': DECIMAL,
-    'Tuple': TUPLE,
 }
 
 class ClickHouseIdentifierPreparer(PGIdentifierPreparer):
@@ -234,16 +230,16 @@ class ClickHouseDialect(default.DefaultDialect):
             if r.type.startswith("AggregateFunction"):
                 # Extract type information from a column
                 # using AggregateFunction
-                # the type from clickhouse will be
+                # the type from clickhouse will be 
                 # AggregateFunction(sum, Int64) for an Int64 type
                 # remove first 24 chars and remove the last one to get Int64
                 col_type = r.type[23:-1]
             elif r.type.startswith("Nullable"):
                 col_type = re.search(r'^\w+', r.type[9:-1]).group(0)
-            else:
+            else:    
                 # Take out the more detailed type information
                 # e.g. 'map<int,int>' -> 'map'
-                #      'decimal(10,1)' -> decimal
+                #      'decimal(10,1)' -> decimal                
                 col_type = re.search(r'^\w+', r.type).group(0)
             try:
                 coltype = ischema_names[col_type]
