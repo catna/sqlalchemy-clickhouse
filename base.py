@@ -28,10 +28,14 @@ class ARRAY(sqltypes.TypeEngine):
 
 # Type converters
 ischema_names = {
+    'Int256': INTEGER,
+    'Int128': INTEGER,
     'Int64': INTEGER,
     'Int32': INTEGER,
     'Int16': INTEGER,
     'Int8': INTEGER,
+    'UInt256': INTEGER,
+    'UInt128': INTEGER,
     'UInt64': INTEGER,
     'UInt32': INTEGER,
     'UInt16': INTEGER,

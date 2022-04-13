@@ -12,6 +12,7 @@ import requests
 from infi.clickhouse_orm.models import ModelBase
 from infi.clickhouse_orm.database import Database
 from datetime import datetime
+from loguru import logger
 
 # PEP 249 module globals
 apilevel = '2.0'
@@ -107,8 +108,20 @@ from six import PY3, string_types
 def _send(self, data, settings=None, stream=False):
     if PY3 and isinstance(data, string_types):
         data = data.encode('utf-8')
+    self.request_session.headers['X-ClickHouse-User'] = self.request_session.auth[0]
+    self.request_session.headers['X-ClickHouse-Key'] = self.request_session.auth[1]
+    self.request_session.headers['X-ClickHouse-Database'] = self.db_name
     params = self._build_params(settings)
-    r = self.request_session.post(self.db_url, params=params, data=data, stream=stream, timeout=self.timeout)
+    assert isinstance(params, dict)
+    # 根据 clickhouse `order by` 的文档, 为了不卡死服务器, 限制内存使用
+    params.update({
+        "max_bytes_before_external_sort": 500000000,
+        "max_bytes_before_external_group_by": 500000000,
+        "enable_http_compression": "1"
+    })
+    r = requests.post(self.db_url, params=params, data=data, stream=stream,
+                      headers=self.request_session.headers)
+    # r = self.request_session.post(self.db_url, params=params, data=data, stream=stream, timeout=self.timeout)
     if r.status_code != 200:
         raise Exception(r.text)
     return r
@@ -359,8 +372,17 @@ class Cursor(object):
     def _process_response(self, response):
         """ Update the internal state with the data from the response """
         assert self._state == self._STATE_RUNNING, "Should be running if processing response"
+        logger.debug(f"recevice res is: {response}")
         cols = None
         data = []
+
+        if not response:
+            raise Exception("this is no response")
+
+        from collections.abc import Iterable
+        if not isinstance(response, (Iterable, list)):
+            response = [response]
+
         for r in response:
             if not cols:
                 cols = [(f, r._fields[f].db_type) for f in r._fields]
