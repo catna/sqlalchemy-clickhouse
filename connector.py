@@ -250,6 +250,7 @@ class Cursor(object):
         else:
             sql = operation % _escaper.escape_args(parameters)
 
+        logger.debug(f"{datetime.now().isoformat()} execute sql: {sql}")
         self._reset_state()
 
         self._state = self._STATE_RUNNING
@@ -392,7 +393,6 @@ class Cursor(object):
     def _process_response(self, response):
         """ Update the internal state with the data from the response """
         assert self._state == self._STATE_RUNNING, "Should be running if processing response"
-        logger.debug(f"recevice res is: {response}")
         cols = None
         data = []
 
