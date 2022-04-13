@@ -19,7 +19,7 @@ setup(
     keywords = "db database cloud analytics clickhouse",
     download_url = 'https://github.com/cloudflare/sqlalchemy-clickhouse/releases/tag/v0.1.5',
     install_requires = [
-        'sqlalchemy>=1.0.0',
+        'sqlalchemy==1.4',
         'infi.clickhouse_orm>=1.2.0'
     ],
     packages=[
