@@ -88,6 +88,9 @@ def create_ad_hoc_field(cls, db_type):
     if db_type.startswith('DateTime'):
         db_type = 'DateTime'
 
+    if db_type.startswith('UInt'):
+        db_type = 'UInt64'
+
     if db_type.startswith('Nullable'):
         inner_field = cls.create_ad_hoc_field(db_type[9 : -1])
         return orm_fields.NullableField(inner_field)
@@ -395,11 +398,6 @@ class Cursor(object):
 
         if not response:
             raise Exception("this is no response")
-
-        from collections.abc import Iterable
-        if not isinstance(response, (Iterable, list)):
-            response = [response]
-
         for r in response:
             if not cols:
                 cols = [(f, r._fields[f].db_type) for f in r._fields]
